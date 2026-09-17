@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Queue Management — KrishiSetu Staff</title>
+  <link rel="icon" href="../assets/krishisetu_logo.png" type="image/png">
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <script src="https://unpkg.com/feather-icons"></script>
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header"><img src="../assets/krishisetu_logo.png" alt="KrishiSetu" class="sidebar-logo"><div class="sidebar-brand">Krishi<span>Setu</span></div></div>
+      <nav class="sidebar-nav">
+        <div class="sidebar-section"><div class="sidebar-section-title">Operations</div>
+          <a href="dashboard.html" class="nav-link"><i data-feather="monitor"></i> Dashboard</a>
+          <a href="bookings.html" class="nav-link"><i data-feather="list"></i> Today's Bookings</a>
+          <a href="queue.html" class="nav-link active"><i data-feather="users"></i> Queue Management</a>
+          <a href="procurement.html" class="nav-link"><i data-feather="package"></i> Procurement</a>
+        </div>
+      </nav>
+      <div class="sidebar-footer"><div class="sidebar-user" onclick="Auth.logout()"><div class="sidebar-avatar" id="user-avatar">AS</div><div class="sidebar-user-info"><div class="sidebar-user-name" id="user-name">Amit Sharma</div><div class="sidebar-user-role">Staff • Logout</div></div></div></div>
+    </aside>
+
+    <main class="main-content">
+      <header class="page-header">
+        <div>
+          <button class="hamburger" onclick="document.getElementById('sidebar').classList.toggle('open')"><span></span><span></span><span></span></button>
+          <h1 class="page-title">Queue Management</h1>
+          <p class="page-subtitle">Call farmers, manage counters, and track queue flow</p>
+        </div>
+        <div class="queue-live-badge">LIVE</div>
+      </header>
+
+      <div class="page-body">
+        <!-- Counter Control Panel -->
+        <div class="card card-elevated mb-6" style="margin-bottom:24px;">
+          <div class="card-header">
+            <h3 class="card-title">🎛️ Counter Control Panel</h3>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;">
+            <div class="counter-card active" id="counter-1">
+              <div class="counter-number">1</div>
+              <div class="counter-label">Counter</div>
+              <div style="margin-top:8px;">
+                <div style="font-size:0.875rem;font-weight:700;color:var(--color-primary);">T-387</div>
+                <div style="font-size:0.75rem;color:var(--color-text-secondary);">Mohan Patel</div>
+              </div>
+              <div style="margin-top:12px;display:flex;gap:6px;flex-direction:column;">
+                <button class="btn btn-primary btn-sm" onclick="callNext(1)"><i data-feather="phone-call"></i> Call Next</button>
+                <button class="btn btn-danger btn-sm" onclick="markNoShow(1)"><i data-feather="user-x"></i> No-Show</button>
+              </div>
+            </div>
+            <div class="counter-card active" id="counter-2">
+              <div class="counter-number">2</div>
+              <div class="counter-label">Counter</div>
+              <div style="margin-top:8px;">
+                <div style="font-size:0.875rem;font-weight:700;color:var(--color-primary);">T-386</div>
+                <div style="font-size:0.75rem;color:var(--color-text-secondary);">In Procurement</div>
+              </div>
+              <div style="margin-top:12px;display:flex;gap:6px;flex-direction:column;">
+                <button class="btn btn-primary btn-sm" onclick="callNext(2)"><i data-feather="phone-call"></i> Call Next</button>
+                <button class="btn btn-danger btn-sm" onclick="markNoShow(2)"><i data-feather="user-x"></i> No-Show</button>
+              </div>
+            </div>
+            <div class="counter-card" id="counter-3">
+              <div class="counter-number">3</div>
+              <div class="counter-label">Counter</div>
+              <div style="margin-top:8px;">
+                <div style="font-size:0.875rem;font-weight:700;">T-383</div>
+                <div style="font-size:0.75rem;color:var(--color-text-secondary);">Weighing</div>
+              </div>
+              <div style="margin-top:12px;display:flex;gap:6px;flex-direction:column;">
+                <button class="btn btn-primary btn-sm" onclick="callNext(3)"><i data-feather="phone-call"></i> Call Next</button>
+                <button class="btn btn-danger btn-sm" onclick="markNoShow(3)"><i data-feather="user-x"></i> No-Show</button>
+              </div>
+            </div>
+            <div class="counter-card" id="counter-4" style="opacity:0.5;">
+              <div class="counter-number" style="color:var(--color-muted);">4</div>
+              <div class="counter-label">Counter</div>
+              <div style="margin-top:8px;">
+                <div style="font-size:0.875rem;color:var(--color-muted);">Idle</div>
+              </div>
+              <div style="margin-top:12px;">
+                <button class="btn btn-secondary btn-sm w-full" onclick="activateCounter(4)"><i data-feather="power"></i> Activate</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Waiting Queue List -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">📋 Waiting Queue</h3>
+            <span class="badge badge-warning">6 farmers waiting</span>
+          </div>
+          <div class="table-container" style="border:none;">
+            <table class="table">
+              <thead>
+                <tr><th>#</th><th>Token</th><th>Farmer</th><th>Crop</th><th>Qty</th><th>Arrived</th><th>Wait Time</th><th>Actions</th></tr>
+              </thead>
+              <tbody>
+                <tr style="background:var(--color-warning-bg);">
+                  <td><strong>1</strong></td><td><strong style="font-size:1.125rem;">T-388</strong></td><td>Anita Verma</td><td>Wheat</td><td>35 Qtl</td><td>7:50 AM</td><td><span style="color:var(--color-warning);font-weight:700;">55 min</span></td>
+                  <td><button class="btn btn-primary btn-sm" onclick="callFarmer('T-388')"><i data-feather="phone-call"></i> Call</button></td>
+                </tr>
+                <tr>
+                  <td><strong>2</strong></td><td><strong style="font-size:1.125rem;">T-389</strong></td><td>Rajesh Kumar</td><td>Wheat</td><td>50 Qtl</td><td>7:45 AM</td><td>25 min</td>
+                  <td><button class="btn btn-ghost btn-sm" disabled>Waiting</button></td>
+                </tr>
+                <tr>
+                  <td><strong>3</strong></td><td><strong style="font-size:1.125rem;">T-390</strong></td><td>Sunita Devi</td><td>Soybean</td><td>32 Qtl</td><td>—</td><td>—</td>
+                  <td><span class="badge badge-info">Booked</span></td>
+                </tr>
+                <tr>
+                  <td><strong>4</strong></td><td><strong>T-391</strong></td><td>Ramesh Yadav</td><td>Wheat</td><td>40 Qtl</td><td>8:10 AM</td><td>15 min</td>
+                  <td><button class="btn btn-ghost btn-sm" disabled>Waiting</button></td>
+                </tr>
+                <tr>
+                  <td><strong>5</strong></td><td><strong>T-392</strong></td><td>Geeta Bai</td><td>Gram</td><td>25 Qtl</td><td>8:20 AM</td><td>8 min</td>
+                  <td><button class="btn btn-ghost btn-sm" disabled>Waiting</button></td>
+                </tr>
+                <tr>
+                  <td><strong>6</strong></td><td><strong>T-393</strong></td><td>Vikram Singh</td><td>Soybean</td><td>55 Qtl</td><td>8:30 AM</td><td>2 min</td>
+                  <td><button class="btn btn-ghost btn-sm" disabled>Waiting</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="../js/api.js"></script>
+  <script src="../js/auth.js"></script>
+  <script>
+    feather.replace();
+    if (!Auth.requireAuth('staff')) {}
+    const user = Auth.getUser();
+    if(user){document.getElementById('user-name').textContent=user.name;document.getElementById('user-avatar').textContent=user.avatar;}
+
+    function callNext(counter) {
+      alert(`Counter ${counter}: Calling next farmer in queue. Notification sent.`);
+    }
+    function callFarmer(token) {
+      alert(`Calling farmer with token ${token}. SMS/Push notification sent.`);
+    }
+    function markNoShow(counter) {
+      if (confirm(`Mark current farmer at Counter ${counter} as No-Show?`)) {
+        alert('Marked as No-Show. Calling next farmer.');
+      }
+    }
+    function activateCounter(counter) {
+      alert(`Counter ${counter} activated. Ready to call next farmer.`);
+      document.getElementById('counter-' + counter).style.opacity = '1';
+      document.getElementById('counter-' + counter).classList.add('active');
+    }
+  </script>
+</body>
+</html>

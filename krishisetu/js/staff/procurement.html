@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Procurement — KrishiSetu Staff</title>
+  <link rel="icon" href="../assets/krishisetu_logo.png" type="image/png">
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <script src="https://unpkg.com/feather-icons"></script>
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header"><img src="../assets/krishisetu_logo.png" alt="KrishiSetu" class="sidebar-logo"><div class="sidebar-brand">Krishi<span>Setu</span></div></div>
+      <nav class="sidebar-nav">
+        <div class="sidebar-section"><div class="sidebar-section-title">Operations</div>
+          <a href="dashboard.html" class="nav-link"><i data-feather="monitor"></i> Dashboard</a>
+          <a href="bookings.html" class="nav-link"><i data-feather="list"></i> Today's Bookings</a>
+          <a href="queue.html" class="nav-link"><i data-feather="users"></i> Queue Management</a>
+          <a href="procurement.html" class="nav-link active"><i data-feather="package"></i> Procurement</a>
+        </div>
+      </nav>
+      <div class="sidebar-footer"><div class="sidebar-user" onclick="Auth.logout()"><div class="sidebar-avatar" id="user-avatar">AS</div><div class="sidebar-user-info"><div class="sidebar-user-name" id="user-name">Amit Sharma</div><div class="sidebar-user-role">Staff • Logout</div></div></div></div>
+    </aside>
+
+    <main class="main-content">
+      <header class="page-header">
+        <div>
+          <button class="hamburger" onclick="document.getElementById('sidebar').classList.toggle('open')"><span></span><span></span><span></span></button>
+          <h1 class="page-title">Procurement</h1>
+          <p class="page-subtitle">Weighbridge operations, quality grading, and procurement completion</p>
+        </div>
+      </header>
+
+      <div class="page-body">
+        <!-- Active Procurement -->
+        <div class="card card-elevated mb-6" style="margin-bottom:24px;border-left:4px solid var(--color-accent);">
+          <div class="card-header">
+            <div>
+              <h3 class="card-title">⚖️ Active Procurement — Counter 1</h3>
+              <p class="card-subtitle">Token T-386 • Mohan Patel</p>
+            </div>
+            <span class="badge badge-accent">IN PROGRESS</span>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:24px;">
+            <div style="background:var(--color-bg);padding:16px;border-radius:12px;">
+              <div style="font-size:0.7rem;color:var(--color-text-secondary);font-weight:600;">FARMER</div>
+              <div style="font-weight:700;margin-top:4px;">Mohan Patel</div>
+              <div style="font-size:0.75rem;color:var(--color-text-secondary);">KS-MP-2024-0078</div>
+            </div>
+            <div style="background:var(--color-bg);padding:16px;border-radius:12px;">
+              <div style="font-size:0.7rem;color:var(--color-text-secondary);font-weight:600;">CROP</div>
+              <div style="font-weight:700;margin-top:4px;">🌾 Wheat (Sharbati)</div>
+              <div style="font-size:0.75rem;color:var(--color-text-secondary);">Booked: 85 Qtl</div>
+            </div>
+            <div style="background:var(--color-bg);padding:16px;border-radius:12px;">
+              <div style="font-size:0.7rem;color:var(--color-text-secondary);font-weight:600;">MSP RATE</div>
+              <div style="font-weight:700;margin-top:4px;color:var(--color-primary);">₹2,275/Qtl</div>
+              <div style="font-size:0.75rem;color:var(--color-text-secondary);">Rabi 2025-26</div>
+            </div>
+          </div>
+
+          <!-- Weighment Form -->
+          <h4 style="font-weight:700;margin-bottom:16px;">Weighment & Quality</h4>
+          <div class="procurement-form">
+            <div class="form-group">
+              <label class="form-label">Gross Weight (Qtl)</label>
+              <input type="number" class="form-input" id="gross-weight" step="0.1" placeholder="0.0" oninput="calcNet()" value="87.5">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Tare Weight (Qtl)</label>
+              <input type="number" class="form-input" id="tare-weight" step="0.1" placeholder="0.0" oninput="calcNet()" value="2.5">
+            </div>
+            <div class="form-group full-width">
+              <div class="weight-display">
+                <div class="weight-label">NET WEIGHT</div>
+                <div class="weight-value" id="net-weight">85.0 Qtl</div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Moisture %</label>
+              <input type="number" class="form-input" id="moisture" step="0.1" placeholder="0.0" value="11.2">
+              <p class="form-hint">Standard: ≤ 12%</p>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Foreign Matter %</label>
+              <input type="number" class="form-input" id="foreign-matter" step="0.1" placeholder="0.0" value="0.8">
+              <p class="form-hint">Standard: ≤ 1%</p>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Quality Grade</label>
+              <select class="form-select" id="quality-grade">
+                <option value="A+">A+ (Premium)</option>
+                <option value="A" selected>A (Standard)</option>
+                <option value="B">B (Below Standard)</option>
+                <option value="C">C (Rejected)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Bonus/Deduction (₹/Qtl)</label>
+              <input type="number" class="form-input" id="bonus" value="50" placeholder="0">
+            </div>
+          </div>
+
+          <!-- Total Calculation -->
+          <div style="background:var(--color-primary-light);border-radius:12px;padding:24px;margin-top:24px;text-align:center;">
+            <div style="font-size:0.75rem;color:var(--color-text-secondary);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;">Estimated Total Amount</div>
+            <div style="font-size:2.5rem;font-weight:900;color:var(--color-primary);letter-spacing:-0.03em;margin-top:4px;" id="total-amount">₹1,97,625</div>
+            <div style="font-size:0.8125rem;color:var(--color-text-secondary);margin-top:4px;" id="calc-breakdown">85.0 Qtl × (₹2,275 + ₹50) = ₹1,97,625</div>
+          </div>
+
+          <div style="display:flex;gap:12px;margin-top:24px;">
+            <button class="btn btn-ghost" onclick="alert('Procurement cancelled.')">Cancel</button>
+            <button class="btn btn-primary btn-lg" onclick="completeProcurement()" style="flex:1;">
+              <i data-feather="check-circle"></i> Complete Procurement
+            </button>
+          </div>
+        </div>
+
+        <!-- Recent Procurements -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">✅ Completed Today</h3>
+          </div>
+          <div class="table-container" style="border:none;">
+            <table class="table">
+              <thead><tr><th>Token</th><th>Farmer</th><th>Crop</th><th>Net Weight</th><th>Grade</th><th>Rate</th><th>Total</th><th>Time</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td><strong>T-385</strong></td><td>Hari Singh</td><td>Wheat</td><td>60.0 Qtl</td>
+                  <td><span class="badge badge-success">A</span></td>
+                  <td>₹2,325/Qtl</td>
+                  <td style="font-weight:700;color:var(--color-primary);">₹1,39,500</td><td>8:40 AM</td>
+                </tr>
+                <tr>
+                  <td><strong>T-384</strong></td><td>Lakshmi Bai</td><td>Gram</td><td>20.0 Qtl</td>
+                  <td><span class="badge badge-success">A+</span></td>
+                  <td>₹5,540/Qtl</td>
+                  <td style="font-weight:700;color:var(--color-primary);">₹1,10,800</td><td>8:25 AM</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="../js/api.js"></script>
+  <script src="../js/auth.js"></script>
+  <script>
+    feather.replace();
+    if (!Auth.requireAuth('staff')) {}
+    const user = Auth.getUser();
+    if(user){document.getElementById('user-name').textContent=user.name;document.getElementById('user-avatar').textContent=user.avatar;}
+
+    function calcNet() {
+      const gross = parseFloat(document.getElementById('gross-weight').value) || 0;
+      const tare = parseFloat(document.getElementById('tare-weight').value) || 0;
+      const net = Math.max(0, gross - tare);
+      document.getElementById('net-weight').textContent = net.toFixed(1) + ' Qtl';
+
+      const baseRate = 2275;
+      const bonus = parseFloat(document.getElementById('bonus').value) || 0;
+      const total = net * (baseRate + bonus);
+      document.getElementById('total-amount').textContent = API.formatCurrency(Math.round(total));
+      document.getElementById('calc-breakdown').textContent = `${net.toFixed(1)} Qtl × (₹${baseRate} + ₹${bonus}) = ${API.formatCurrency(Math.round(total))}`;
+    }
+
+    function completeProcurement() {
+      const gross = parseFloat(document.getElementById('gross-weight').value);
+      const tare = parseFloat(document.getElementById('tare-weight').value);
+      const moisture = parseFloat(document.getElementById('moisture').value);
+      const fm = parseFloat(document.getElementById('foreign-matter').value);
+      const grade = document.getElementById('quality-grade').value;
+      const bonus = parseFloat(document.getElementById('bonus').value) || 0;
+
+      if (!gross || !tare) { alert('Please enter gross and tare weights.'); return; }
+
+      API.createProcurement({
+        bookingId: 'BK003', tokenNumber: 'T-386', farmerId: 'F003', farmerName: 'Mohan Patel',
+        cropName: 'Wheat', grossWeightQtl: gross, tareWeightQtl: tare,
+        moisturePercent: moisture, foreignMatterPercent: fm, qualityGrade: grade,
+        baseRatePerQtl: 2275, bonusPerQtl: bonus, weighbridgeOperator: user.id,
+      });
+
+      alert('✅ Procurement completed for T-386 (Mohan Patel).\nPayment processing initiated.');
+    }
+
+    calcNet();
+  </script>
+</body>
+</html>

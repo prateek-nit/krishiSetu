@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Login to KrishiSetu — Smart Agricultural Procurement Platform for Farmers, Staff, and Administrators.">
+  <title>Login — KrishiSetu</title>
+  <link rel="icon" href="assets/krishisetu_logo.png" type="image/png">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/components.css">
+  <script src="https://unpkg.com/feather-icons"></script>
+</head>
+<body>
+  <div class="login-page">
+    <!-- Left Visual Panel -->
+    <div class="login-visual">
+      <div class="login-visual-content">
+        <img src="assets/krishisetu_logo.png" alt="KrishiSetu Logo">
+        <h2>KrishiSetu</h2>
+        <p style="font-size:1.125rem;font-weight:600;color:rgba(255,255,255,0.9);margin-bottom:8px;">Book. Track. Sell Smarter.</p>
+        <p>Smart Agricultural Procurement & Market Advisory Platform</p>
+        <div style="margin-top:48px;display:flex;gap:24px;justify-content:center;">
+          <div style="text-align:center;">
+            <div style="font-size:1.5rem;font-weight:800;">12,800+</div>
+            <div style="font-size:0.75rem;opacity:0.6;">Farmers</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-size:1.5rem;font-weight:800;">5</div>
+            <div style="font-size:0.75rem;opacity:0.6;">Centres</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-size:1.5rem;font-weight:800;">₹20 Cr+</div>
+            <div style="font-size:0.75rem;opacity:0.6;">Disbursed</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Form Panel -->
+    <div class="login-form-container">
+      <div class="login-form-box">
+        <a href="index.html" class="flex items-center gap-2 mb-6" style="margin-bottom:24px;text-decoration:none;">
+          <i data-feather="arrow-left" style="width:16px;height:16px;color:var(--color-text-secondary);"></i>
+          <span style="font-size:0.8125rem;color:var(--color-text-secondary);">Back to Home</span>
+        </a>
+
+        <h1>Welcome Back</h1>
+        <p class="login-subtitle">Select your role and sign in to continue</p>
+
+        <!-- Role Selector -->
+        <div class="role-selector" id="role-selector">
+          <div class="role-option selected" data-role="farmer" onclick="selectRole('farmer')">
+            <div style="display:flex;justify-content:center;"><i data-feather="user" style="width:28px;height:28px;color:var(--color-primary);"></i></div>
+            <div class="role-name" style="margin-top:8px;">Farmer</div>
+          </div>
+          <div class="role-option" data-role="staff" onclick="selectRole('staff')">
+            <div style="display:flex;justify-content:center;"><i data-feather="clipboard" style="width:28px;height:28px;color:var(--color-primary);"></i></div>
+            <div class="role-name" style="margin-top:8px;">Staff</div>
+          </div>
+          <div class="role-option" data-role="admin" onclick="selectRole('admin')">
+            <div style="display:flex;justify-content:center;"><i data-feather="shield" style="width:28px;height:28px;color:var(--color-primary);"></i></div>
+            <div class="role-name" style="margin-top:8px;">Admin</div>
+          </div>
+        </div>
+
+        <!-- Login Form -->
+        <form id="login-form" onsubmit="handleLogin(event)">
+          <div class="form-group mb-4" style="margin-bottom:16px;">
+            <label class="form-label" for="phone">Mobile Number</label>
+            <input type="tel" id="phone" class="form-input" placeholder="Enter 10-digit mobile number" maxlength="10" pattern="[0-9]{10}" required>
+          </div>
+          <div class="form-group mb-4" style="margin-bottom:16px;" id="otp-group" style="display:none;">
+            <label class="form-label" for="otp">OTP</label>
+            <div class="flex gap-2">
+              <input type="text" id="otp" class="form-input" placeholder="Enter 6-digit OTP" maxlength="6" pattern="[0-9]{6}">
+              <button type="button" class="btn btn-secondary btn-sm" onclick="sendOTP()" id="send-otp-btn">Send OTP</button>
+            </div>
+            <p class="form-hint" id="otp-hint" style="display:none;">✅ OTP sent! For demo, enter any 6 digits.</p>
+          </div>
+          <button type="submit" class="btn btn-primary btn-lg w-full" id="login-btn">
+            <i data-feather="log-in" style="width:18px;height:18px;"></i> Sign In
+          </button>
+        </form>
+
+        <!-- Demo Login -->
+        <div class="demo-login-section">
+          <h4>⚡ Quick Demo Access</h4>
+          <div class="demo-buttons">
+            <button class="btn btn-secondary w-full" onclick="demoLogin('farmer')" style="flex:1;">
+              <i data-feather="user" style="width:14px;height:14px;"></i> Farmer Demo
+            </button>
+            <button class="btn btn-secondary w-full" onclick="demoLogin('staff')" style="flex:1;">
+              <i data-feather="clipboard" style="width:14px;height:14px;"></i> Staff Demo
+            </button>
+            <button class="btn btn-secondary w-full" onclick="demoLogin('admin')" style="flex:1;">
+              <i data-feather="shield" style="width:14px;height:14px;"></i> Admin Demo
+            </button>
+          </div>
+        </div>
+
+        <p style="text-align:center;margin-top:24px;font-size:0.75rem;color:var(--color-muted);">
+          © 2026 KrishiSetu • SIH Prototype
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/auth.js"></script>
+  <script>
+    feather.replace();
+
+    let selectedRole = 'farmer';
+    let otpSent = false;
+
+    function selectRole(role) {
+      selectedRole = role;
+      document.querySelectorAll('.role-option').forEach(el => el.classList.remove('selected'));
+      document.querySelector(`.role-option[data-role="${role}"]`).classList.add('selected');
+    }
+
+    function sendOTP() {
+      const phone = document.getElementById('phone').value;
+      if (phone.length !== 10) {
+        alert('Please enter a valid 10-digit mobile number.');
+        return;
+      }
+      otpSent = true;
+      document.getElementById('otp-hint').style.display = 'block';
+      document.getElementById('send-otp-btn').textContent = 'Resend';
+      document.getElementById('send-otp-btn').style.opacity = '0.6';
+    }
+
+    function handleLogin(e) {
+      e.preventDefault();
+      const phone = document.getElementById('phone').value;
+      const otp = document.getElementById('otp').value;
+
+      if (!phone || phone.length !== 10) {
+        alert('Please enter a valid 10-digit mobile number.');
+        return;
+      }
+
+      if (!otp || otp.length !== 6) {
+        alert('Please enter the 6-digit OTP. For demo, enter any 6 digits.');
+        return;
+      }
+
+      if (Auth.login(phone, otp, selectedRole)) {
+        window.location.href = Auth.getDashboardPath(selectedRole);
+      } else {
+        alert('Login failed. Please try again.');
+      }
+    }
+
+    function demoLogin(role) {
+      if (Auth.demoLogin(role)) {
+        window.location.href = Auth.getDashboardPath(role);
+      }
+    }
+
+    // If already logged in, redirect
+    if (Auth.isLoggedIn()) {
+      const role = Auth.getRole();
+      window.location.href = Auth.getDashboardPath(role);
+    }
+  </script>
+</body>
+</html>

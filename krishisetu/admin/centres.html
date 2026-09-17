@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Centres — KrishiSetu Admin</title>
+  <link rel="icon" href="../assets/krishisetu_logo.png" type="image/png">
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <script src="https://unpkg.com/feather-icons"></script>
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header"><img src="../assets/krishisetu_logo.png" alt="KrishiSetu" class="sidebar-logo"><div class="sidebar-brand">Krishi<span>Setu</span></div></div>
+      <nav class="sidebar-nav">
+        <div class="sidebar-section"><div class="sidebar-section-title">Administration</div>
+          <a href="dashboard.html" class="nav-link"><i data-feather="bar-chart-2"></i> Dashboard</a>
+          <a href="centres.html" class="nav-link active"><i data-feather="map-pin"></i> Centres</a>
+          <a href="farmers.html" class="nav-link"><i data-feather="users"></i> Farmers</a>
+          <a href="payments.html" class="nav-link"><i data-feather="credit-card"></i> Payments</a>
+          <a href="analytics.html" class="nav-link"><i data-feather="pie-chart"></i> Analytics</a>
+        </div>
+      </nav>
+      <div class="sidebar-footer"><div class="sidebar-user" onclick="Auth.logout()"><div class="sidebar-avatar" id="user-avatar">PV</div><div class="sidebar-user-info"><div class="sidebar-user-name" id="user-name">Dr. Priya Verma</div><div class="sidebar-user-role">Admin • Logout</div></div></div></div>
+    </aside>
+
+    <main class="main-content">
+      <header class="page-header">
+        <div>
+          <button class="hamburger" onclick="document.getElementById('sidebar').classList.toggle('open')"><span></span><span></span><span></span></button>
+          <h1 class="page-title">Procurement Centres</h1>
+          <p class="page-subtitle">Manage centres, capacity, and operational status</p>
+        </div>
+        <button class="btn btn-primary" onclick="document.getElementById('centre-modal').classList.add('show');feather.replace();"><i data-feather="plus"></i> Add Centre</button>
+      </header>
+
+      <div class="page-body">
+        <div class="grid grid-auto gap-6" id="centres-grid"></div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Add Centre Modal -->
+  <div class="modal-backdrop" id="centre-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">Add Procurement Centre</h3>
+        <button class="modal-close" onclick="document.getElementById('centre-modal').classList.remove('show')"><i data-feather="x" style="width:16px;height:16px;"></i></button>
+      </div>
+      <form onsubmit="event.preventDefault();alert('Centre added successfully!');document.getElementById('centre-modal').classList.remove('show');">
+        <div class="form-group mb-4" style="margin-bottom:16px;">
+          <label class="form-label">Centre Name</label>
+          <input type="text" class="form-input" placeholder="e.g. Indore Krishi Mandi" required>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+          <div class="form-group"><label class="form-label">District</label><input type="text" class="form-input" placeholder="District" required></div>
+          <div class="form-group"><label class="form-label">Location</label><input type="text" class="form-input" placeholder="Address" required></div>
+          <div class="form-group"><label class="form-label">Active Counters</label><input type="number" class="form-input" value="2" min="1" max="10"></div>
+          <div class="form-group"><label class="form-label">Daily Capacity (Qtl)</label><input type="number" class="form-input" value="1000" min="100"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-ghost" onclick="document.getElementById('centre-modal').classList.remove('show')">Cancel</button>
+          <button type="submit" class="btn btn-primary"><i data-feather="check"></i> Add Centre</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="../js/api.js"></script>
+  <script src="../js/auth.js"></script>
+  <script>
+    feather.replace();
+    if (!Auth.requireAuth('admin')) {}
+    const user = Auth.getUser();
+    if(user){document.getElementById('user-name').textContent=user.name;document.getElementById('user-avatar').textContent=user.avatar;}
+
+    const centres = API.getCentres();
+    const grid = document.getElementById('centres-grid');
+
+    centres.forEach(c => {
+      const utilization = Math.round((c.procuredTodayQuintals / c.dailyCapacityQuintals) * 100);
+      const fillClass = utilization < 50 ? 'low' : utilization < 80 ? 'mid' : 'high';
+      const statusBadge = c.status === 'active' ? '<span class="badge badge-success">Active</span>' : '<span class="badge badge-warning">Maintenance</span>';
+
+      grid.innerHTML += `
+        <div class="card card-elevated animate-fade-in-up">
+          <div class="flex items-center justify-between mb-4" style="margin-bottom:16px;">
+            <div>
+              <h3 style="font-size:1.125rem;font-weight:700;">${c.name}</h3>
+              <p style="font-size:0.8125rem;color:var(--color-text-secondary);margin-top:2px;"><i data-feather="map-pin" style="width:12px;height:12px;display:inline;vertical-align:middle;"></i> ${c.location}</p>
+            </div>
+            ${statusBadge}
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+            <div style="background:var(--color-bg);padding:12px;border-radius:10px;">
+              <div style="font-size:0.7rem;color:var(--color-text-secondary);font-weight:600;">DISTRICT</div>
+              <div style="font-weight:700;margin-top:4px;">${c.district}</div>
+            </div>
+            <div style="background:var(--color-bg);padding:12px;border-radius:10px;">
+              <div style="font-size:0.7rem;color:var(--color-text-secondary);font-weight:600;">DISTANCE</div>
+              <div style="font-weight:700;margin-top:4px;">${c.distanceKm} km</div>
+            </div>
+            <div style="background:var(--color-bg);padding:12px;border-radius:10px;">
+              <div style="font-size:0.7rem;color:var(--color-text-secondary);font-weight:600;">COUNTERS</div>
+              <div style="font-weight:700;margin-top:4px;">${c.activeCounters} active</div>
+            </div>
+            <div style="background:var(--color-bg);padding:12px;border-radius:10px;">
+              <div style="font-size:0.7rem;color:var(--color-text-secondary);font-weight:600;">TODAY</div>
+              <div style="font-weight:700;margin-top:4px;">${c.procuredTodayQuintals.toLocaleString()} Qtl</div>
+            </div>
+          </div>
+
+          <div style="margin-bottom:12px;">
+            <div class="flex justify-between mb-2" style="margin-bottom:4px;">
+              <span style="font-size:0.8125rem;font-weight:600;">Daily Capacity</span>
+              <span style="font-weight:700;font-size:0.8125rem;">${c.procuredTodayQuintals.toLocaleString()} / ${c.dailyCapacityQuintals.toLocaleString()} Qtl</span>
+            </div>
+            <div class="capacity-bar">
+              <div class="capacity-track"><div class="capacity-fill ${fillClass}" style="width:${utilization}%"></div></div>
+              <span class="capacity-label">${utilization}%</span>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-ghost btn-sm" style="flex:1;" onclick="alert('Edit centre: ${c.name}')"><i data-feather="edit-2"></i> Edit</button>
+            <button class="btn btn-ghost btn-sm" style="flex:1;" onclick="alert('Viewing details for ${c.name}')"><i data-feather="eye"></i> Details</button>
+          </div>
+        </div>`;
+    });
+    feather.replace();
+  </script>
+</body>
+</html>

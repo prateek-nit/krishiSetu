@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — KrishiSetu Staff</title>
+  <link rel="icon" href="../assets/krishisetu_logo.png" type="image/png">
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <script src="https://unpkg.com/feather-icons"></script>
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header"><img src="../assets/krishisetu_logo.png" alt="KrishiSetu" class="sidebar-logo"><div class="sidebar-brand">Krishi<span>Setu</span></div></div>
+      <nav class="sidebar-nav">
+        <div class="sidebar-section"><div class="sidebar-section-title">Operations</div>
+          <a href="dashboard.html" class="nav-link active"><i data-feather="monitor"></i> Dashboard</a>
+          <a href="bookings.html" class="nav-link"><i data-feather="list"></i> Today's Bookings</a>
+          <a href="queue.html" class="nav-link"><i data-feather="users"></i> Queue Management</a>
+          <a href="procurement.html" class="nav-link"><i data-feather="package"></i> Procurement</a>
+        </div>
+      </nav>
+      <div class="sidebar-footer"><div class="sidebar-user" onclick="Auth.logout()"><div class="sidebar-avatar" id="user-avatar">AS</div><div class="sidebar-user-info"><div class="sidebar-user-name" id="user-name">Amit Sharma</div><div class="sidebar-user-role">Staff • Logout</div></div><i data-feather="log-out" style="width:16px;height:16px;opacity:0.5;"></i></div></div>
+    </aside>
+
+    <main class="main-content">
+      <header class="page-header">
+        <div>
+          <button class="hamburger" onclick="document.getElementById('sidebar').classList.toggle('open')"><span></span><span></span><span></span></button>
+          <h1 class="page-title">Staff Dashboard</h1>
+          <p class="page-subtitle">Bhopal Krishi Upaj Mandi — Today's Operations Overview</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="badge badge-success">Centre: Active</span>
+          <span class="text-sm text-muted" id="today-date"></span>
+        </div>
+      </header>
+
+      <div class="page-body">
+        <!-- KPIs -->
+        <div class="kpi-grid stagger-children">
+          <div class="kpi-card kpi-blue animate-fade-in-up">
+            <div class="kpi-icon"><i data-feather="calendar"></i></div>
+            <div class="kpi-value">18</div>
+            <div class="kpi-label">Today's Bookings</div>
+          </div>
+          <div class="kpi-card kpi-green animate-fade-in-up">
+            <div class="kpi-icon"><i data-feather="log-in"></i></div>
+            <div class="kpi-value">14</div>
+            <div class="kpi-label">Arrivals</div>
+          </div>
+          <div class="kpi-card kpi-purple animate-fade-in-up">
+            <div class="kpi-icon"><i data-feather="check-circle"></i></div>
+            <div class="kpi-value">8</div>
+            <div class="kpi-label">Procured Today</div>
+          </div>
+          <div class="kpi-card kpi-gold animate-fade-in-up">
+            <div class="kpi-icon"><i data-feather="clock"></i></div>
+            <div class="kpi-value">6</div>
+            <div class="kpi-label">In Queue</div>
+          </div>
+        </div>
+
+        <!-- Quick Actions + Queue Status -->
+        <div class="grid grid-2 gap-6 mt-8" style="margin-top:32px;">
+          <div class="card card-elevated">
+            <div class="card-header">
+              <h3 class="card-title">⚡ Quick Actions</h3>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+              <a href="queue.html" class="btn btn-primary btn-lg" style="flex-direction:column;padding:20px;height:auto;">
+                <i data-feather="phone-call" style="width:24px;height:24px;"></i>
+                <span style="margin-top:8px;">Call Next</span>
+              </a>
+              <a href="bookings.html" class="btn btn-secondary btn-lg" style="flex-direction:column;padding:20px;height:auto;">
+                <i data-feather="log-in" style="width:24px;height:24px;"></i>
+                <span style="margin-top:8px;">Mark Arrival</span>
+              </a>
+              <a href="procurement.html" class="btn btn-accent btn-lg" style="flex-direction:column;padding:20px;height:auto;">
+                <i data-feather="package" style="width:24px;height:24px;"></i>
+                <span style="margin-top:8px;">Start Procurement</span>
+              </a>
+              <button class="btn btn-danger btn-lg" style="flex-direction:column;padding:20px;height:auto;" onclick="alert('No-show marked for current token.')">
+                <i data-feather="user-x" style="width:24px;height:24px;"></i>
+                <span style="margin-top:8px;">Mark No-Show</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="card card-elevated">
+            <div class="card-header">
+              <h3 class="card-title">🔄 Live Queue Status</h3>
+              <div class="queue-live-badge" style="font-size:10px;">LIVE</div>
+            </div>
+            <div style="text-align:center;padding:16px 0;">
+              <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--color-text-secondary);font-weight:700;">Now Serving</div>
+              <div style="font-size:3rem;font-weight:900;color:var(--color-primary);letter-spacing:-0.03em;">T-387</div>
+              <div style="font-size:0.875rem;color:var(--color-text-secondary);">Counter 1 • Mohan Patel</div>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:8px;">
+              <div class="counter-card active" style="padding:10px;">
+                <div style="font-weight:800;font-size:1.125rem;color:var(--color-primary);">C1</div>
+                <div style="font-size:0.65rem;color:var(--color-text-secondary);">T-387</div>
+              </div>
+              <div class="counter-card active" style="padding:10px;">
+                <div style="font-weight:800;font-size:1.125rem;color:var(--color-primary);">C2</div>
+                <div style="font-size:0.65rem;color:var(--color-text-secondary);">T-386</div>
+              </div>
+              <div class="counter-card" style="padding:10px;">
+                <div style="font-weight:800;font-size:1.125rem;">C3</div>
+                <div style="font-size:0.65rem;color:var(--color-text-secondary);">T-383</div>
+              </div>
+              <div class="counter-card" style="padding:10px;">
+                <div style="font-weight:800;font-size:1.125rem;color:var(--color-muted);">C4</div>
+                <div style="font-size:0.65rem;color:var(--color-muted);">Idle</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Today's Capacity -->
+        <div class="card mt-6" style="margin-top:24px;">
+          <div class="card-header">
+            <h3 class="card-title">📊 Today's Capacity</h3>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px;">
+            <div>
+              <div style="font-size:0.8125rem;font-weight:600;margin-bottom:8px;">Procurement (Quintals)</div>
+              <div class="capacity-bar">
+                <div class="capacity-track"><div class="capacity-fill mid" style="width:62%;"></div></div>
+                <span class="capacity-label">62%</span>
+              </div>
+              <div style="font-size:0.75rem;color:var(--color-text-secondary);margin-top:4px;">1,245 / 2,000 Qtl</div>
+            </div>
+            <div>
+              <div style="font-size:0.8125rem;font-weight:600;margin-bottom:8px;">Slots Utilization</div>
+              <div class="capacity-bar">
+                <div class="capacity-track"><div class="capacity-fill low" style="width:72%;"></div></div>
+                <span class="capacity-label">72%</span>
+              </div>
+              <div style="font-size:0.75rem;color:var(--color-text-secondary);margin-top:4px;">18 / 25 slots filled</div>
+            </div>
+            <div>
+              <div style="font-size:0.8125rem;font-weight:600;margin-bottom:8px;">Avg Wait Time</div>
+              <div class="capacity-bar">
+                <div class="capacity-track"><div class="capacity-fill low" style="width:45%;"></div></div>
+                <span class="capacity-label">28m</span>
+              </div>
+              <div style="font-size:0.75rem;color:var(--color-text-secondary);margin-top:4px;">Target: < 45 minutes</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Queue Activity -->
+        <div class="card mt-6" style="margin-top:24px;">
+          <div class="card-header">
+            <h3 class="card-title">Recent Queue Activity</h3>
+            <a href="bookings.html" class="btn btn-ghost btn-sm">View All</a>
+          </div>
+          <div class="table-container" style="border:none;">
+            <table class="table">
+              <thead><tr><th>Token</th><th>Farmer</th><th>Crop</th><th>Qty</th><th>Status</th><th>Counter</th><th>Time</th></tr></thead>
+              <tbody>
+                <tr><td><strong>T-387</strong></td><td>Mohan Patel</td><td>Wheat</td><td>85 Qtl</td><td><span class="badge badge-accent">Called</span></td><td>Counter 2</td><td>8:45 AM</td></tr>
+                <tr><td><strong>T-385</strong></td><td>Hari Singh</td><td>Wheat</td><td>60 Qtl</td><td><span class="badge badge-success">Completed</span></td><td>Counter 1</td><td>8:40 AM</td></tr>
+                <tr><td><strong>T-389</strong></td><td>Rajesh Kumar</td><td>Wheat</td><td>50 Qtl</td><td><span class="badge badge-warning">Waiting</span></td><td>—</td><td>7:45 AM</td></tr>
+                <tr><td><strong>T-390</strong></td><td>Sunita Devi</td><td>Soybean</td><td>32 Qtl</td><td><span class="badge badge-info">Booked</span></td><td>—</td><td>—</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="../js/api.js"></script>
+  <script src="../js/auth.js"></script>
+  <script>
+    feather.replace();
+    if (!Auth.requireAuth('staff')) {}
+    const user = Auth.getUser();
+    if(user){document.getElementById('user-name').textContent=user.name;document.getElementById('user-avatar').textContent=user.avatar;}
+    document.getElementById('today-date').textContent = new Date().toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  </script>
+</body>
+</html>

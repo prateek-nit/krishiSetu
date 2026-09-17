@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alerts — KrishiSetu Farmer</title>
+  <link rel="icon" href="../assets/krishisetu_logo.png" type="image/png">
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <script src="https://unpkg.com/feather-icons"></script>
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header"><img src="../assets/krishisetu_logo.png" alt="KrishiSetu" class="sidebar-logo"><div class="sidebar-brand">Krishi<span>Setu</span></div></div>
+      <nav class="sidebar-nav">
+        <div class="sidebar-section"><div class="sidebar-section-title">Main Menu</div>
+          <a href="dashboard.html" class="nav-link"><i data-feather="home"></i> Dashboard</a>
+          <a href="crops.html" class="nav-link"><i data-feather="layers"></i> My Crops</a>
+          <a href="book-slot.html" class="nav-link"><i data-feather="calendar"></i> Book Slot</a>
+          <a href="queue.html" class="nav-link"><i data-feather="radio"></i> My Queue</a>
+          <a href="payments.html" class="nav-link"><i data-feather="credit-card"></i> Payments</a>
+        </div>
+        <div class="sidebar-section"><div class="sidebar-section-title">Intelligence</div>
+          <a href="market-ai.html" class="nav-link"><i data-feather="trending-up"></i> Market AI</a>
+          <a href="alerts.html" class="nav-link active"><i data-feather="bell"></i> Alerts</a>
+        </div>
+      </nav>
+      <div class="sidebar-footer"><div class="sidebar-user" onclick="Auth.logout()"><div class="sidebar-avatar" id="user-avatar">RK</div><div class="sidebar-user-info"><div class="sidebar-user-name" id="user-name">Rajesh Kumar</div><div class="sidebar-user-role">Farmer • Logout</div></div></div></div>
+    </aside>
+
+    <main class="main-content">
+      <header class="page-header">
+        <div>
+          <button class="hamburger" onclick="document.getElementById('sidebar').classList.toggle('open')"><span></span><span></span><span></span></button>
+          <h1 class="page-title">Alerts & Notifications</h1>
+          <p class="page-subtitle">Stay updated on your bookings, queue, and payments</p>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="markAllRead()"><i data-feather="check" style="width:14px;height:14px;"></i> Mark all read</button>
+      </header>
+
+      <div class="page-body">
+        <div class="notification-list" id="notifications-list">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <nav class="mobile-nav">
+    <a href="dashboard.html" class="mobile-nav-item"><i data-feather="home"></i>Home</a>
+    <a href="crops.html" class="mobile-nav-item"><i data-feather="layers"></i>Crops</a>
+    <a href="queue.html" class="mobile-nav-item"><i data-feather="radio"></i>Queue</a>
+    <a href="market-ai.html" class="mobile-nav-item"><i data-feather="trending-up"></i>Market</a>
+    <a href="alerts.html" class="mobile-nav-item active"><i data-feather="bell"></i>Alerts</a>
+  </nav>
+
+  <script src="../js/api.js"></script>
+  <script src="../js/auth.js"></script>
+  <script>
+    feather.replace();
+    if (!Auth.requireAuth('farmer')) {}
+    const user = Auth.getUser();
+    if(user){document.getElementById('user-name').textContent=user.name;document.getElementById('user-avatar').textContent=user.avatar;}
+
+    function renderNotifications() {
+      const notifications = API.getNotifications('F001');
+      const list = document.getElementById('notifications-list');
+      const iconMap = { booking: 'calendar', queue: 'radio', payment: 'credit-card', market: 'trending-up' };
+
+      list.innerHTML = notifications.map(n => {
+        const timeAgo = getTimeAgo(n.time);
+        return `
+        <div class="notification-item ${n.read ? '' : 'unread'}" onclick="markRead('${n.id}', this)">
+          <div class="notification-icon ${n.type}">
+            <i data-feather="${iconMap[n.type] || 'bell'}" style="width:20px;height:20px;"></i>
+          </div>
+          <div class="notification-content">
+            <div class="notification-title">${n.title}</div>
+            <div class="notification-text">${n.message}</div>
+            <div class="notification-time">${timeAgo}</div>
+          </div>
+          ${!n.read ? '<div style="width:8px;height:8px;background:var(--color-primary);border-radius:50%;flex-shrink:0;"></div>' : ''}
+        </div>`;
+      }).join('');
+      feather.replace();
+    }
+
+    function markRead(id, el) {
+      API.markRead(id);
+      el.classList.remove('unread');
+      const dot = el.querySelector('[style*="border-radius:50%"]');
+      if (dot) dot.remove();
+    }
+
+    function markAllRead() {
+      API.getNotifications('F001').forEach(n => API.markRead(n.id));
+      renderNotifications();
+    }
+
+    function getTimeAgo(dateStr) {
+      const now = new Date();
+      const then = new Date(dateStr);
+      const diffMs = now - then;
+      const diffMins = Math.floor(diffMs / 60000);
+      if (diffMins < 60) return diffMins + ' minutes ago';
+      const diffHrs = Math.floor(diffMins / 60);
+      if (diffHrs < 24) return diffHrs + ' hours ago';
+      const diffDays = Math.floor(diffHrs / 24);
+      return diffDays + ' days ago';
+    }
+
+    renderNotifications();
+  </script>
+</body>
+</html>

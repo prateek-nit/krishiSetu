@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book Slot — KrishiSetu Farmer</title>
+  <link rel="icon" href="../assets/krishisetu_logo.png" type="image/png">
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <script src="https://unpkg.com/feather-icons"></script>
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <img src="../assets/krishisetu_logo.png" alt="KrishiSetu" class="sidebar-logo">
+        <div class="sidebar-brand">Krishi<span>Setu</span></div>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="sidebar-section">
+          <div class="sidebar-section-title">Main Menu</div>
+          <a href="dashboard.html" class="nav-link"><i data-feather="home"></i> Dashboard</a>
+          <a href="crops.html" class="nav-link"><i data-feather="layers"></i> My Crops</a>
+          <a href="book-slot.html" class="nav-link active"><i data-feather="calendar"></i> Book Slot</a>
+          <a href="queue.html" class="nav-link"><i data-feather="radio"></i> My Queue</a>
+          <a href="payments.html" class="nav-link"><i data-feather="credit-card"></i> Payments</a>
+        </div>
+        <div class="sidebar-section">
+          <div class="sidebar-section-title">Intelligence</div>
+          <a href="market-ai.html" class="nav-link"><i data-feather="trending-up"></i> Market AI</a>
+          <a href="alerts.html" class="nav-link"><i data-feather="bell"></i> Alerts</a>
+        </div>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="sidebar-user" onclick="Auth.logout()">
+          <div class="sidebar-avatar" id="user-avatar">RK</div>
+          <div class="sidebar-user-info">
+            <div class="sidebar-user-name" id="user-name">Rajesh Kumar</div>
+            <div class="sidebar-user-role">Farmer • Logout</div>
+          </div>
+          <i data-feather="log-out" style="width:16px;height:16px;opacity:0.5;"></i>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="page-header">
+        <div>
+          <button class="hamburger" onclick="document.getElementById('sidebar').classList.toggle('open')"><span></span><span></span><span></span></button>
+          <h1 class="page-title">Book Procurement Slot</h1>
+          <p class="page-subtitle">Schedule your visit to the procurement centre</p>
+        </div>
+      </header>
+
+      <div class="page-body">
+        <!-- Wizard Steps -->
+        <div class="wizard-steps" id="wizard-steps">
+          <div class="wizard-step active" data-step="1">
+            <div class="wizard-step-number">1</div>
+            <span class="wizard-step-label">Crop</span>
+          </div>
+          <div class="wizard-connector"></div>
+          <div class="wizard-step" data-step="2">
+            <div class="wizard-step-number">2</div>
+            <span class="wizard-step-label">Quantity</span>
+          </div>
+          <div class="wizard-connector"></div>
+          <div class="wizard-step" data-step="3">
+            <div class="wizard-step-number">3</div>
+            <span class="wizard-step-label">Centre</span>
+          </div>
+          <div class="wizard-connector"></div>
+          <div class="wizard-step" data-step="4">
+            <div class="wizard-step-number">4</div>
+            <span class="wizard-step-label">Date & Slot</span>
+          </div>
+          <div class="wizard-connector"></div>
+          <div class="wizard-step" data-step="5">
+            <div class="wizard-step-number">5</div>
+            <span class="wizard-step-label">Confirm</span>
+          </div>
+        </div>
+
+        <!-- Step Content -->
+        <div class="wizard-content">
+          <!-- Step 1: Select Crop -->
+          <div class="card card-elevated" id="step-1">
+            <h3 style="font-size:1.125rem;font-weight:700;margin-bottom:20px;">Select Crop for Procurement</h3>
+            <div id="crop-options" style="display:flex;flex-direction:column;gap:12px;"></div>
+          </div>
+
+          <!-- Step 2: Quantity -->
+          <div class="card card-elevated hidden" id="step-2">
+            <h3 style="font-size:1.125rem;font-weight:700;margin-bottom:20px;">Enter Quantity</h3>
+            <div class="form-group">
+              <label class="form-label">Quantity (Quintals)</label>
+              <input type="number" class="form-input" id="quantity-input" placeholder="Enter quantity in quintals" min="1" max="200" value="50">
+              <p class="form-hint">Minimum 1 Qtl, Maximum 200 Qtl per slot</p>
+            </div>
+            <div style="display:flex;gap:12px;margin-top:24px;">
+              <button class="btn btn-ghost" onclick="goToStep(1)"><i data-feather="arrow-left"></i> Back</button>
+              <button class="btn btn-primary" onclick="goToStep(3)" style="flex:1;"><i data-feather="arrow-right"></i> Next: Select Centre</button>
+            </div>
+          </div>
+
+          <!-- Step 3: Centre -->
+          <div class="card card-elevated hidden" id="step-3">
+            <h3 style="font-size:1.125rem;font-weight:700;margin-bottom:20px;">Select Procurement Centre</h3>
+            <div id="centre-options" style="display:flex;flex-direction:column;gap:12px;"></div>
+            <div style="display:flex;gap:12px;margin-top:24px;">
+              <button class="btn btn-ghost" onclick="goToStep(2)"><i data-feather="arrow-left"></i> Back</button>
+            </div>
+          </div>
+
+          <!-- Step 4: Date & Slot -->
+          <div class="card card-elevated hidden" id="step-4">
+            <h3 style="font-size:1.125rem;font-weight:700;margin-bottom:20px;">Select Date & Time Slot</h3>
+            <div class="form-group mb-4" style="margin-bottom:16px;">
+              <label class="form-label">Date</label>
+              <input type="date" class="form-input" id="date-input" onchange="loadSlots()">
+            </div>
+            <div id="slot-options" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;"></div>
+            <div style="display:flex;gap:12px;margin-top:24px;">
+              <button class="btn btn-ghost" onclick="goToStep(3)"><i data-feather="arrow-left"></i> Back</button>
+            </div>
+          </div>
+
+          <!-- Step 5: Confirmation -->
+          <div class="card card-elevated hidden" id="step-5">
+            <h3 style="font-size:1.125rem;font-weight:700;margin-bottom:20px;">Confirm Booking</h3>
+            <div id="booking-summary" style="background:var(--color-bg);border-radius:12px;padding:20px;"></div>
+            <div style="display:flex;gap:12px;margin-top:24px;">
+              <button class="btn btn-ghost" onclick="goToStep(4)"><i data-feather="arrow-left"></i> Back</button>
+              <button class="btn btn-primary btn-lg" onclick="confirmBooking()" style="flex:1;">
+                <i data-feather="check-circle"></i> Confirm Booking
+              </button>
+            </div>
+          </div>
+
+          <!-- Success: Token Display -->
+          <div class="hidden" id="step-success">
+            <div class="token-display">
+              <div class="token-label">Your Digital Token</div>
+              <div class="token-value" id="success-token">T-391</div>
+              <div class="token-qr">
+                <canvas id="qr-canvas"></canvas>
+              </div>
+              <div class="token-details">
+                <div class="token-detail-item">
+                  <div class="td-label">Crop</div>
+                  <div class="td-value" id="success-crop">Wheat</div>
+                </div>
+                <div class="token-detail-item">
+                  <div class="td-label">Quantity</div>
+                  <div class="td-value" id="success-qty">50 Qtl</div>
+                </div>
+                <div class="token-detail-item">
+                  <div class="td-label">Centre</div>
+                  <div class="td-value" id="success-centre">Bhopal Mandi</div>
+                </div>
+                <div class="token-detail-item">
+                  <div class="td-label">Date & Slot</div>
+                  <div class="td-value" id="success-slot">18 Sep, 08:00-10:00</div>
+                </div>
+              </div>
+            </div>
+            <div style="text-align:center;margin-top:24px;display:flex;gap:12px;justify-content:center;">
+              <a href="queue.html" class="btn btn-primary btn-lg"><i data-feather="radio"></i> Track Queue</a>
+              <a href="dashboard.html" class="btn btn-secondary btn-lg"><i data-feather="home"></i> Dashboard</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <nav class="mobile-nav">
+    <a href="dashboard.html" class="mobile-nav-item"><i data-feather="home"></i>Home</a>
+    <a href="crops.html" class="mobile-nav-item"><i data-feather="layers"></i>Crops</a>
+    <a href="queue.html" class="mobile-nav-item"><i data-feather="radio"></i>Queue</a>
+    <a href="market-ai.html" class="mobile-nav-item"><i data-feather="trending-up"></i>Market</a>
+    <a href="alerts.html" class="mobile-nav-item"><i data-feather="bell"></i>Alerts</a>
+  </nav>
+
+  <script src="../js/api.js"></script>
+  <script src="../js/auth.js"></script>
+  <script>
+    feather.replace();
+    if (!Auth.requireAuth('farmer')) {}
+    const user = Auth.getUser();
+    if(user){document.getElementById('user-name').textContent=user.name;document.getElementById('user-avatar').textContent=user.avatar;}
+
+    let booking = { crop: '', variety: '', quantity: 50, centreId: '', centreName: '', date: '', timeSlot: '' };
+    let currentStep = 1;
+
+    // Initialize date input
+    const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
+    document.getElementById('date-input').value = tomorrow.toISOString().split('T')[0];
+    document.getElementById('date-input').min = tomorrow.toISOString().split('T')[0];
+
+    // Step 1: Render crop options
+    const farmerCrops = API.getFarmerCrops('F001');
+    const cropOpts = document.getElementById('crop-options');
+    farmerCrops.forEach(c => {
+      const icon = API.getCrops().find(cr => cr.name === c.cropName)?.icon || '🌱';
+      cropOpts.innerHTML += `
+        <div class="card" style="cursor:pointer;border:2px solid var(--color-border);padding:16px;" onclick="selectCrop('${c.cropName}','${c.variety}',this)">
+          <div class="flex items-center gap-3">
+            <span style="font-size:28px;">${icon}</span>
+            <div style="flex:1;">
+              <div style="font-weight:700;">${c.cropName}</div>
+              <div style="font-size:0.8125rem;color:var(--color-text-secondary);">${c.variety} • ${c.estimatedYieldQuintals} Qtl yield</div>
+            </div>
+            <i data-feather="chevron-right" style="width:20px;height:20px;color:var(--color-muted);"></i>
+          </div>
+        </div>`;
+    });
+    // Also add a generic option
+    API.getCrops().forEach(c => {
+      if (!farmerCrops.find(fc => fc.cropName === c.name)) {
+        cropOpts.innerHTML += `
+          <div class="card" style="cursor:pointer;border:2px solid var(--color-border);padding:16px;" onclick="selectCrop('${c.name}','${c.variety}',this)">
+            <div class="flex items-center gap-3">
+              <span style="font-size:28px;">${c.icon}</span>
+              <div style="flex:1;">
+                <div style="font-weight:700;">${c.name}</div>
+                <div style="font-size:0.8125rem;color:var(--color-text-secondary);">${c.variety} • MSP ₹${c.msp}/Qtl</div>
+              </div>
+              <i data-feather="chevron-right" style="width:20px;height:20px;color:var(--color-muted);"></i>
+            </div>
+          </div>`;
+      }
+    });
+
+    function selectCrop(name, variety, el) {
+      booking.crop = name; booking.variety = variety;
+      document.querySelectorAll('#crop-options .card').forEach(c => c.style.borderColor = 'var(--color-border)');
+      el.style.borderColor = 'var(--color-primary)';
+      setTimeout(() => goToStep(2), 200);
+    }
+
+    // Step 3: Centre options
+    function renderCentres() {
+      const centres = API.getCentres().filter(c => c.status === 'active');
+      const centreOpts = document.getElementById('centre-options');
+      centreOpts.innerHTML = centres.map(c => {
+        const utilization = Math.round((c.procuredTodayQuintals / c.dailyCapacityQuintals) * 100);
+        const fillClass = utilization < 50 ? 'low' : utilization < 80 ? 'mid' : 'high';
+        return `
+        <div class="card" style="cursor:pointer;border:2px solid var(--color-border);padding:16px;" onclick="selectCentre('${c.id}','${c.name}',this)">
+          <div class="flex items-center justify-between">
+            <div>
+              <div style="font-weight:700;">${c.name}</div>
+              <div style="font-size:0.8125rem;color:var(--color-text-secondary);">${c.location} • ${c.distanceKm} km away</div>
+            </div>
+            <span class="badge badge-primary">${c.activeCounters} Counters</span>
+          </div>
+          <div class="capacity-bar" style="margin-top:12px;">
+            <div class="capacity-track"><div class="capacity-fill ${fillClass}" style="width:${utilization}%"></div></div>
+            <span class="capacity-label">${utilization}%</span>
+          </div>
+        </div>`;
+      }).join('');
+    }
+    renderCentres();
+
+    function selectCentre(id, name, el) {
+      booking.centreId = id; booking.centreName = name;
+      document.querySelectorAll('#centre-options .card').forEach(c => c.style.borderColor = 'var(--color-border)');
+      el.style.borderColor = 'var(--color-primary)';
+      setTimeout(() => { goToStep(4); loadSlots(); }, 200);
+    }
+
+    // Step 4: Slots
+    function loadSlots() {
+      const date = document.getElementById('date-input').value;
+      booking.date = date;
+      const slots = API.getSlots(booking.centreId, date);
+      const slotOpts = document.getElementById('slot-options');
+      
+      if (slots.length === 0) {
+        slotOpts.innerHTML = '<p style="grid-column:1/-1;text-align:center;color:var(--color-text-secondary);padding:20px;">No slots available for this date. Try another date.</p>';
+        return;
+      }
+      slotOpts.innerHTML = slots.map(s => {
+        const available = s.capacity - s.booked;
+        const full = available <= 0;
+        return `
+        <div class="card ${full ? '' : ''}" style="cursor:${full?'not-allowed':'pointer'};border:2px solid var(--color-border);padding:16px;text-align:center;opacity:${full?'0.5':'1'};" onclick="${full ? '' : `selectSlot('${s.timeSlot}',this)`}">
+          <div style="font-weight:700;font-size:1rem;">${s.timeSlot}</div>
+          <div style="font-size:0.8125rem;color:${full?'var(--color-danger)':'var(--color-success)'};font-weight:600;margin-top:4px;">${full ? 'Full' : available + ' slots available'}</div>
+        </div>`;
+      }).join('');
+    }
+
+    function selectSlot(slot, el) {
+      booking.timeSlot = slot;
+      document.querySelectorAll('#slot-options .card').forEach(c => c.style.borderColor = 'var(--color-border)');
+      el.style.borderColor = 'var(--color-primary)';
+      setTimeout(() => goToStep(5), 200);
+    }
+
+    // Step 5: Summary
+    function renderSummary() {
+      document.getElementById('booking-summary').innerHTML = `
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+          <div><div style="font-size:0.7rem;color:var(--color-text-secondary);font-weight:600;">CROP</div><div style="font-weight:700;margin-top:4px;">${booking.crop} (${booking.variety})</div></div>
+          <div><div style="font-size:0.7rem;color:var(--color-text-secondary);font-weight:600;">QUANTITY</div><div style="font-weight:700;margin-top:4px;">${booking.quantity} Quintals</div></div>
+          <div><div style="font-size:0.7rem;color:var(--color-text-secondary);font-weight:600;">CENTRE</div><div style="font-weight:700;margin-top:4px;">${booking.centreName}</div></div>
+          <div><div style="font-size:0.7rem;color:var(--color-text-secondary);font-weight:600;">DATE</div><div style="font-weight:700;margin-top:4px;">${API.formatDate(booking.date)}</div></div>
+          <div style="grid-column:1/-1;"><div style="font-size:0.7rem;color:var(--color-text-secondary);font-weight:600;">TIME SLOT</div><div style="font-weight:700;margin-top:4px;">${booking.timeSlot}</div></div>
+        </div>
+      `;
+    }
+
+    function goToStep(step) {
+      if (step === 2) booking.quantity = parseInt(document.getElementById('quantity-input').value) || 50;
+      document.querySelectorAll('[id^="step-"]').forEach(el => el.classList.add('hidden'));
+      document.getElementById(`step-${step}`).classList.remove('hidden');
+      // Update wizard indicators
+      document.querySelectorAll('.wizard-step').forEach((ws, i) => {
+        ws.classList.remove('active', 'completed');
+        if (i + 1 < step) ws.classList.add('completed');
+        if (i + 1 === step) ws.classList.add('active');
+      });
+      document.querySelectorAll('.wizard-connector').forEach((wc, i) => {
+        wc.classList.toggle('active', i + 1 < step);
+      });
+      if (step === 5) renderSummary();
+      currentStep = step;
+      feather.replace();
+    }
+
+    function confirmBooking() {
+      const result = API.createBooking({
+        farmerId: 'F001', farmerName: user.name, cropName: booking.crop, variety: booking.variety,
+        quantityQuintals: booking.quantity, centreId: booking.centreId, centreName: booking.centreName,
+        bookingDate: booking.date, timeSlot: booking.timeSlot,
+      });
+      // Show success
+      document.querySelectorAll('[id^="step-"]').forEach(el => el.classList.add('hidden'));
+      document.getElementById('step-success').classList.remove('hidden');
+      document.getElementById('success-token').textContent = result.tokenNumber;
+      document.getElementById('success-crop').textContent = booking.crop;
+      document.getElementById('success-qty').textContent = booking.quantity + ' Qtl';
+      document.getElementById('success-centre').textContent = booking.centreName;
+      document.getElementById('success-slot').textContent = API.formatDate(booking.date) + ', ' + booking.timeSlot;
+      document.querySelector('.wizard-steps').classList.add('hidden');
+      // Simple QR placeholder
+      const canvas = document.getElementById('qr-canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = 140; canvas.height = 140;
+      ctx.fillStyle = '#176B3A';
+      // Draw a simple grid pattern as QR placeholder
+      for (let i = 0; i < 14; i++) {
+        for (let j = 0; j < 14; j++) {
+          if (Math.random() > 0.45) {
+            ctx.fillRect(i * 10, j * 10, 9, 9);
+          }
+        }
+      }
+      // Add corners
+      ctx.fillStyle = '#0B3D24';
+      ctx.fillRect(0, 0, 30, 30); ctx.fillRect(110, 0, 30, 30); ctx.fillRect(0, 110, 30, 30);
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(5, 5, 20, 20); ctx.fillRect(115, 5, 20, 20); ctx.fillRect(5, 115, 20, 20);
+      ctx.fillStyle = '#0B3D24';
+      ctx.fillRect(9, 9, 12, 12); ctx.fillRect(119, 9, 12, 12); ctx.fillRect(9, 119, 12, 12);
+      feather.replace();
+    }
+
+    feather.replace();
+  </script>
+</body>
+</html>
