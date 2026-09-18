@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payments — KrishiSetu Admin</title>
+  <link rel="icon" href="../assets/krishisetu_logo.png" type="image/png">
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <script src="https://unpkg.com/feather-icons"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header"><img src="../assets/krishisetu_logo.png" alt="KrishiSetu" class="sidebar-logo"><div class="sidebar-brand">Krishi<span>Setu</span></div></div>
+      <nav class="sidebar-nav">
+        <div class="sidebar-section"><div class="sidebar-section-title">Administration</div>
+          <a href="dashboard.html" class="nav-link"><i data-feather="bar-chart-2"></i> Dashboard</a>
+          <a href="centres.html" class="nav-link"><i data-feather="map-pin"></i> Centres</a>
+          <a href="farmers.html" class="nav-link"><i data-feather="users"></i> Farmers</a>
+          <a href="payments.html" class="nav-link active"><i data-feather="credit-card"></i> Payments</a>
+          <a href="analytics.html" class="nav-link"><i data-feather="pie-chart"></i> Analytics</a>
+        </div>
+      </nav>
+      <div class="sidebar-footer"><div class="sidebar-user" onclick="Auth.logout()"><div class="sidebar-avatar" id="user-avatar">PV</div><div class="sidebar-user-info"><div class="sidebar-user-name" id="user-name">Dr. Priya Verma</div><div class="sidebar-user-role">Admin • Logout</div></div></div></div>
+    </aside>
+
+    <main class="main-content">
+      <header class="page-header">
+        <div>
+          <button class="hamburger" onclick="document.getElementById('sidebar').classList.toggle('open')"><span></span><span></span><span></span></button>
+          <h1 class="page-title">Payment Oversight</h1>
+          <p class="page-subtitle">PFMS DBT payment monitoring and batch management</p>
+        </div>
+        <button class="btn btn-primary" onclick="alert('Batch approval initiated for 45 pending payments.')"><i data-feather="check-square"></i> Approve Batch</button>
+      </header>
+
+      <div class="page-body">
+        <!-- Payment KPIs -->
+        <div class="kpi-grid stagger-children">
+          <div class="kpi-card kpi-green animate-fade-in-up">
+            <div class="kpi-icon"><i data-feather="check-circle"></i></div>
+            <div class="kpi-value">₹20.3Cr</div>
+            <div class="kpi-label">Total Disbursed</div>
+          </div>
+          <div class="kpi-card kpi-blue animate-fade-in-up">
+            <div class="kpi-icon"><i data-feather="check"></i></div>
+            <div class="kpi-value">3,200</div>
+            <div class="kpi-label">Completed</div>
+          </div>
+          <div class="kpi-card kpi-gold animate-fade-in-up">
+            <div class="kpi-icon"><i data-feather="loader"></i></div>
+            <div class="kpi-value">180</div>
+            <div class="kpi-label">Processing</div>
+          </div>
+          <div class="kpi-card kpi-red animate-fade-in-up">
+            <div class="kpi-icon"><i data-feather="alert-circle"></i></div>
+            <div class="kpi-value">12</div>
+            <div class="kpi-label">Failed</div>
+          </div>
+        </div>
+
+        <div class="grid grid-2 gap-6 mt-8" style="margin-top:32px;">
+          <!-- Payment Status Chart -->
+          <div class="chart-card">
+            <div class="chart-header">
+              <h3 class="chart-title">Payment Status Distribution</h3>
+            </div>
+            <div class="chart-body">
+              <canvas id="paymentChart"></canvas>
+            </div>
+          </div>
+
+          <!-- Daily Disbursement -->
+          <div class="chart-card">
+            <div class="chart-header">
+              <h3 class="chart-title">Daily Disbursement (₹ Lakhs)</h3>
+            </div>
+            <div class="chart-body">
+              <canvas id="disbursementChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- All Payments Table -->
+        <div class="card mt-8" style="margin-top:32px;">
+          <div class="card-header">
+            <h3 class="card-title">All Transactions</h3>
+            <div class="flex gap-2">
+              <button class="filter-chip active" onclick="filterPay('all',this)">All</button>
+              <button class="filter-chip" onclick="filterPay('COMPLETED',this)">Completed</button>
+              <button class="filter-chip" onclick="filterPay('PROCESSING',this)">Processing</button>
+              <button class="filter-chip" onclick="filterPay('FAILED',this)">Failed</button>
+            </div>
+          </div>
+          <div class="table-container" style="border:none;">
+            <table class="table">
+              <thead><tr><th>Date</th><th>Token</th><th>Farmer</th><th>Crop</th><th>Qty</th><th>Amount</th><th>DBT Ref</th><th>Bank</th><th>Status</th></tr></thead>
+              <tbody id="payments-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="../js/api.js"></script>
+  <script src="../js/auth.js"></script>
+  <script>
+    feather.replace();
+    if (!Auth.requireAuth('admin')) {}
+    const user = Auth.getUser();
+    if(user){document.getElementById('user-name').textContent=user.name;document.getElementById('user-avatar').textContent=user.avatar;}
+
+    // Payment Status Doughnut
+    new Chart(document.getElementById('paymentChart').getContext('2d'), {
+      type: 'doughnut',
+      data: {
+        labels: ['Completed', 'Processing', 'Pending', 'Failed'],
+        datasets: [{
+          data: [3200, 180, 45, 12],
+          backgroundColor: ['#22C55E', '#F59E0B', '#3B82F6', '#EF4444'],
+          borderWidth: 3, borderColor: '#FFFFFF',
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false, cutout: '65%',
+        plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, padding: 16, font: { family: 'Inter', size: 12 } } } }
+      }
+    });
+
+    // Daily Disbursement Line
+    const analytics = API.getAnalytics();
+    new Chart(document.getElementById('disbursementChart').getContext('2d'), {
+      type: 'line',
+      data: {
+        labels: analytics.dailyProcurement.map(d => { const dt = new Date(d.date); return dt.toLocaleDateString('en-IN',{day:'numeric',month:'short'}); }),
+        datasets: [{
+          label: '₹ Lakhs',
+          data: analytics.dailyProcurement.map(d => Math.round(d.value / 100000)),
+          borderColor: '#176B3A', backgroundColor: 'rgba(23,107,58,0.1)',
+          fill: true, tension: 0.4, borderWidth: 3, pointRadius: 5, pointBackgroundColor: '#176B3A',
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { family: 'Inter', size: 11 }, callback: v => '₹' + v + 'L' } },
+          x: { grid: { display: false }, ticks: { font: { family: 'Inter', size: 11 } } }
+        }
+      }
+    });
+
+    // All payments (from all farmers)
+    const allPayments = API.getPayments({});
+
+    function renderPayments(payments) {
+      document.getElementById('payments-body').innerHTML = payments.map(p => `
+        <tr>
+          <td>${API.formatDate(p.date)}</td>
+          <td><strong>${p.tokenNumber}</strong></td>
+          <td>${p.farmerName}</td>
+          <td>${p.cropName}</td>
+          <td>${p.quantityQtl} Qtl</td>
+          <td style="font-weight:700;color:var(--color-primary);">${API.formatCurrency(p.amount)}</td>
+          <td><code style="font-size:0.7rem;background:var(--color-bg);padding:2px 6px;border-radius:4px;">${p.dbtReference}</code></td>
+          <td>${p.bankName}</td>
+          <td><span class="badge ${API.getStatusBadgeClass(p.status)}">${p.status}</span></td>
+        </tr>
+      `).join('');
+    }
+
+    function filterPay(status, btn) {
+      document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      renderPayments(status === 'all' ? allPayments : allPayments.filter(p => p.status === status));
+    }
+
+    renderPayments(allPayments);
+  </script>
+</body>
+</html>
